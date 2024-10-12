@@ -10,18 +10,38 @@ import {
   Menu,
 } from "lucide-react";
 import { generateMnemonic } from "bip39";
+import { FaRegCopy } from "react-icons/fa6";
+import { useToast } from "@/hooks/use-toast";
 
 import Link from "next/link";
 import Theme from "@/components/ui/darkmode";
 
 export default function Component() {
   const [mnemonic, setMnemonic] = useState("");
+  const [textToCopy, setTextToCopy] = useState(
+    "This is the text to be copied!"
+  );
+  const [copySuccess, setCopySuccess] = useState("");
+  const { toast } = useToast();
 
   const handleclick = () => {
     const data = generateMnemonic();
     setMnemonic(data);
     console.log("Generated Mnemonic:", data);
     console.log("clicked");
+  };
+
+  const copyToClipboard = async (textToCopy: string) => {
+    try {
+      await navigator.clipboard.writeText(textToCopy);
+      setCopySuccess(textToCopy);
+
+      toast({
+        description: "Text Copied.",
+      });
+    } catch (err) {
+      setCopySuccess("Failed to copy text.");
+    }
   };
 
   return (
@@ -112,6 +132,12 @@ export default function Component() {
                           {word}
                         </Button>
                       ))}
+                    {mnemonic && (
+                      <FaRegCopy
+                        className="cursor-pointer"
+                        onClick={() => copyToClipboard(mnemonic)}
+                      />
+                    )}
                   </CardContent>
                 </Card>
                 <Card>
